@@ -23,6 +23,7 @@ import lombok.extern.log4j.Log4j2;
 public class LoginController {
 	private final LoginService loginService;
 
+	// git test haha
 	// 로컬 로그인
 	@PostMapping("/login")
 	public ResponseEntity<LoginResDto> login(
