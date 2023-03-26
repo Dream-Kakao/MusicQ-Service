@@ -133,7 +133,6 @@ public class LoginServiceImpl implements LoginService {
 
 				// Redis에 (해당 id - 해당 토큰)이 존재 한다면
 				if (tokenInRedis.equals(tokenInCookie)) {
-					log.warn(tokenInCookie);
 					// 유효기간 1일 늘려서 Redis에 다시 저장
 					boolean redisSaveToken = saveToken(id, tokenInRedis);
 
@@ -214,7 +213,6 @@ public class LoginServiceImpl implements LoginService {
 				}
 			}
 		}
-		log.warn(accessToken);
 		return accessToken;
 	}
 
@@ -234,7 +232,7 @@ public class LoginServiceImpl implements LoginService {
 	// Redis에 (id - access token) 쌍이 존재한다면 그 access token을 반환하는 메서드
 	@Override
 	public String getToken(String id) {
-		String accessToken = redisTemplate.opsForValue().get(id);
+		String accessToken = redisTemplate.opsForValue().get(id).trim();
 		return accessToken;
 	}
 
