@@ -45,5 +45,8 @@ public class LoginController {
 		return loginResult;
 	}
 
+
+	// 자동 로그인
+
 	// OAuth 로그인
 }
