@@ -4,6 +4,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +42,13 @@ public class RoomController {
 		@Valid @PathVariable("roomId") String roomId
 	) {
 		return roomService.enter(roomId);
+	}
+
+	// 방 삭제(DELETE)
+	@DeleteMapping("/delete/{roomId}")
+	public ResponseEntity<String> deleteRoom(
+		@Valid @PathVariable("roomId") String roomId
+	) {
+		return roomService.deleteRoom(roomId);
 	}
 }

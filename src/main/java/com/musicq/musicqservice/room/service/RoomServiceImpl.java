@@ -1,5 +1,7 @@
 package com.musicq.musicqservice.room.service;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,4 +28,16 @@ public class RoomServiceImpl implements RoomService{
 
 		return response;
 	}
+
+	@Override
+	public ResponseEntity<String> deleteRoom(String roomId) {
+		ResponseEntity<String> response = restTemplate.exchange("http://localhost:81/v1/rooms/delete/{roomId}",
+			HttpMethod.DELETE, HttpEntity.EMPTY, String.class, roomId);
+		log.info(response.getStatusCode());
+		log.info(response.getHeaders());
+		log.info(response.getBody());
+
+		return response;
+	}
 }
+
