@@ -50,6 +50,29 @@ public class MemberServiceImpl implements MemberService {
 		return response;
 	}
 
+	// 비밀 번호 수정
+	@Override
+	public ResponseEntity<Object> changPassword(String id, String password) {
+		try {
+			String EnPassword = Encoder.encodeStr(password);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<String> request = new HttpEntity<>(EnPassword, headers);
+
+			ResponseEntity<Object> response = restTemplate.exchange("http://localhost:81/v1/members/password/{id}",
+				HttpMethod.PUT, request, Object.class, id);
+			return response;
+
+		} catch (NullPointerException e) {
+			log.warn(e.getStackTrace());
+			log.warn(e.getMessage());
+			log.warn("React 에서 값 잘못 준거임 ㅅㄱ.");
+			ResultResDto failResponse = new ResultResDto("Invalid Variable");
+
+			return ResponseEntity.badRequest().body(failResponse);
+		}
+	}
+
 	// 회원 정보 수정
 	@Override
 	public ResponseEntity<Object> memberInfoChange(String id, MemberInfoDto memberInfoDto) {

@@ -58,6 +58,15 @@ public class MemberController {
 		return memberService.memberInfoChange(id, memberInfoDto);
 	}
 
+	// 패스워드 수정
+	@PutMapping("/password/{id}")
+	public ResponseEntity<Object> changePassword(
+		@Valid @PathVariable("id") String id,
+		@Valid @RequestBody String password
+	) {
+		return memberService.changPassword(id, password);
+	}
+
 	// 회원 탈퇴
 	@DeleteMapping("/member/{id}")
 	public ResponseEntity<String> unregister(
@@ -107,6 +116,7 @@ public class MemberController {
 		return memberService.checkNickname(id, nickname);
 	}
 
+	// 이메일 인증
 	@GetMapping("/email/authentication/{email}")
 	public ResponseEntity<ResultResDto> emailAuthentication(
 		@Valid @PathVariable("email") String email
