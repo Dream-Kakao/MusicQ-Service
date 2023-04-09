@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.musicq.musicqservice.member.dto.MemberInfoDto;
+import com.musicq.musicqservice.member.dto.MemberInfoChangeDto;
+import com.musicq.musicqservice.member.dto.MemberSignUpInfoDto;
 import com.musicq.musicqservice.member.dto.ResultResDto;
 import com.musicq.musicqservice.member.service.MailService;
 import com.musicq.musicqservice.member.service.MemberService;
@@ -36,7 +37,7 @@ public class MemberController {
 	// 회원 가입
 	@PostMapping("/member")
 	public ResponseEntity<String> signup(
-		@Valid @RequestBody MemberInfoDto memberInfo
+		@Valid @RequestBody MemberSignUpInfoDto memberInfo
 	) {
 		return memberService.signup(memberInfo);
 	}
@@ -53,9 +54,9 @@ public class MemberController {
 	@PutMapping("/member/{id}")
 	public ResponseEntity<Object> memberInfoChanges(
 		@Valid @PathVariable("id") String id,
-		@Valid @RequestBody MemberInfoDto memberInfoDto
+		@Valid @RequestBody MemberInfoChangeDto memberInfoChangeDto
 	) {
-		return memberService.memberInfoChange(id, memberInfoDto);
+		return memberService.memberInfoChange(id, memberInfoChangeDto);
 	}
 
 	// 패스워드 수정
