@@ -1,5 +1,8 @@
 package com.musicq.musicqservice.room.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +36,21 @@ public class RoomServiceImpl implements RoomService{
 	public ResponseEntity<String> deleteRoom(String roomId) {
 		ResponseEntity<String> response = restTemplate.exchange("http://localhost:81/v1/rooms/delete/{roomId}",
 			HttpMethod.DELETE, HttpEntity.EMPTY, String.class, roomId);
+		log.info(response.getStatusCode());
+		log.info(response.getHeaders());
+		log.info(response.getBody());
+
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Object> searchAll(Integer page) {
+		String baseUrl = "http://localhost:81/v1/rooms/all";
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(baseUrl).append("?page=").append(page);
+		String searchingUrl = stringBuilder.toString();
+		ResponseEntity<Object> response = restTemplate.getForEntity(searchingUrl,
+			Object.class);
 		log.info(response.getStatusCode());
 		log.info(response.getHeaders());
 		log.info(response.getBody());
