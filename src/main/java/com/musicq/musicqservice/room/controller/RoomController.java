@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.musicq.musicqservice.room.dto.RoomCreateDto;
 import com.musicq.musicqservice.room.service.RoomService;
 
 import io.openvidu.java.client.OpenViduHttpException;
@@ -29,12 +30,20 @@ public class RoomController {
 
 	// 방 생성(POST)
 	@CrossOrigin("*")
-	@PostMapping("/sessions")
+	@PostMapping("/create")
 	public ResponseEntity<String> createSession(
 		@Valid @RequestBody(required = false) Map<String, Object> params,
 		@Valid HttpServletRequest request
 	) throws OpenViduHttpException, OpenViduJavaClientException {
 		return roomService.createSession(params, request);
+	}
+
+	@PostMapping("/create/{sessionId}")
+	public ResponseEntity<String> createRoom(
+		@Valid @PathVariable String sessionId,
+		@Valid @RequestBody RoomCreateDto roomCreateDto
+	) {
+		return roomService.createRoom(sessionId, roomCreateDto);
 	}
 
 	// 방 입장(POST)
@@ -46,16 +55,6 @@ public class RoomController {
 	) throws OpenViduJavaClientException, OpenViduHttpException {
 		return roomService.createConnection(sessionId, params);
 	}
-
-	/*
-	@PostMapping("/create")
-	public ResponseEntity<String> createRoom(
-		@Valid @RequestBody RoomCreateDto roomCreateDto,
-		@Valid HttpServletRequest request
-	) {
-		return roomService.createRoom(roomCreateDto);
-	}
-	 */
 
 	// 방 입장(GET)
 	// TODO - 병주 : 아직 오픈비두 라이브러리와 검증 로직은 사용하지 않았음.

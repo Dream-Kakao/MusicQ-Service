@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.musicq.musicqservice.room.dto.RoomCreateDto;
+
 import io.openvidu.java.client.Connection;
 import io.openvidu.java.client.ConnectionProperties;
 import io.openvidu.java.client.OpenVidu;
@@ -47,6 +49,16 @@ public class RoomServiceImpl implements RoomService {
 		SessionProperties properties = SessionProperties.fromJson(params).build();
 		Session session = openVidu.createSession(properties);
 		return new ResponseEntity<>(session.getSessionId(), HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<String> createRoom(String sessionId, RoomCreateDto roomCreateDto) {
+		ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:81/v1/rooms/create/{sessionId}",
+			roomCreateDto, String.class, sessionId);
+		log.info(response.getStatusCode());
+		log.info(response.getHeaders());
+		log.info(response.getBody());
+		return response;
 	}
 
 	// 방 입장 - connection 생성
