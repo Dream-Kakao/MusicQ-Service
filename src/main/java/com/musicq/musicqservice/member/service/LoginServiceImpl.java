@@ -1,5 +1,6 @@
 package com.musicq.musicqservice.member.service;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
@@ -189,10 +190,6 @@ public class LoginServiceImpl implements LoginService {
 	public ResponseEntity<String> checkId(String id) {
 		ResponseEntity<String> result = restTemplate.getForEntity("http://localhost:81/v1/members/id/{id}",
 			String.class, id);
-		log.info(result.getStatusCode());
-		log.info(result.getHeaders());
-		log.info(result.getBody());
-
 		return result;
 	}
 
@@ -201,10 +198,6 @@ public class LoginServiceImpl implements LoginService {
 	public String checkPassword(String id) {
 		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:81/v1/members/password/{id}",
 			String.class, id);
-		log.info(response.getStatusCode());
-		log.info(response.getHeaders());
-		log.info(response.getBody());
-
 		JSONObject jsonPassword = new JSONObject(response.getBody());
 		String password = jsonPassword.getString("password");
 
@@ -227,13 +220,18 @@ public class LoginServiceImpl implements LoginService {
 		// Cookie 값 중 해당 서비스에서 발급한 헤더의 이름에 맞는 Cookie값이 있는지 확인
 		String accessToken = null;
 
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(jwtHeader)) {
-					accessToken = cookie.getValue();
-					break;
+		try {
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals(jwtHeader)) {
+						accessToken = cookie.getValue();
+						break;
+					}
 				}
 			}
+		} catch (NullPointerException e) {
+			// 예외 처리
+			accessToken = null;
 		}
 		return accessToken;
 	}
@@ -254,7 +252,12 @@ public class LoginServiceImpl implements LoginService {
 	// Redis에 (id - access token) 쌍이 존재한다면 그 access token을 반환하는 메서드
 	@Override
 	public String getToken(String id) {
-		String accessToken = redisTemplate.opsForValue().get(id).trim();
-		return accessToken;
+		try {
+			String accessToken = Objects.requireNonNull(redisTemplate.opsForValue().get(id)).trim();
+			return accessToken;
+		} catch (NullPointerException e) {
+			// 예외 처리
+			return null;
+		}
 	}
 }

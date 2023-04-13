@@ -10,9 +10,9 @@ import com.musicq.musicqservice.member.dto.MemberSignUpInfoDto;
 
 @Service
 public interface MemberService {
-	ResponseEntity<String> signup(MemberSignUpInfoDto memberSignUpInfoDto);
+	ResponseEntity<ResponseDto> signup(MemberSignUpInfoDto memberSignUpInfoDto);
 
-	ResponseEntity<String> memberInfoCheck(String id);
+	ResponseEntity<ResponseDto> memberInfoCheck(String id);
 
 	ResponseEntity<ResponseDto> memberInfoChange(String id, MemberInfoChangeDto memberInfoChangeDto);
 

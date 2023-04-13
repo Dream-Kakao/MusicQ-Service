@@ -38,7 +38,7 @@ public class MemberController {
 
 	// 회원 가입
 	@PostMapping("/member")
-	public ResponseEntity<String> signup(
+	public ResponseEntity<ResponseDto> signup(
 		@Valid @RequestBody MemberSignUpInfoDto memberInfo
 	) {
 		return memberService.signup(memberInfo);
@@ -46,7 +46,7 @@ public class MemberController {
 
 	// 회원 정보 조회
 	@GetMapping("/member/{id}")
-	public ResponseEntity<String> memberInfoCheck(
+	public ResponseEntity<ResponseDto> memberInfoCheck(
 		@Valid @PathVariable("id") String id
 	) {
 		return memberService.memberInfoCheck(id);

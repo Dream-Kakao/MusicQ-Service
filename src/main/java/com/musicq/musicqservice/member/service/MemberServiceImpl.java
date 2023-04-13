@@ -31,38 +31,91 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 가입
 	@Override
-	public ResponseEntity<String> signup(MemberSignUpInfoDto memberSignUpInfoDto) {
+	public ResponseEntity<ResponseDto> signup(MemberSignUpInfoDto memberSignUpInfoDto) {
+		try {
+			JSONObject jsonExistId = new JSONObject(checkId(memberSignUpInfoDto.getId()).getBody());
+			JSONObject jsonExistEmail = new JSONObject(checkEmail(memberSignUpInfoDto.getEmail()).getBody());
+			JSONObject jsonExistNickName = new JSONObject(checkNickname(memberSignUpInfoDto.getId(),
+				memberSignUpInfoDto.getNickname()).getBody());
 
-		log.warn(memberSignUpInfoDto.getMemberImage().getPath());
-		log.warn(memberSignUpInfoDto.getMemberImage().getProfile_img());
-		log.warn(memberSignUpInfoDto.getMemberImage().getUuid());
-		memberSignUpInfoDto.setPassword(Encoder.encodeStr(memberSignUpInfoDto.getPassword().toLowerCase()));
-		ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:81/v1/members/member",
-			memberSignUpInfoDto, String.class);
-		log.info(response.getStatusCode());
-		log.info(response.getHeaders());
-		log.info(response.getBody());
-		return response;
+			long cntExistId = jsonExistId.getJSONObject("data").getLong("count");
+			long cntExistEmail = jsonExistEmail.getJSONObject("data").getLong("count");
+			long cntExistNickName = Long.parseLong(jsonExistNickName.getJSONObject("data").getString("count"));
+
+			if (cntExistId + cntExistEmail + cntExistNickName == 0) {
+				memberSignUpInfoDto.setPassword(Encoder.encodeStr(memberSignUpInfoDto.getPassword().toLowerCase()));
+				ResponseEntity<Object> result = restTemplate.postForEntity("http://localhost:81/v1/members/member",
+					memberSignUpInfoDto, Object.class);
+
+				ResponseDto response = ResponseDto.builder()
+					.success(true)
+					.data(result.getBody())
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else if (cntExistId != 0) {
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.error(ErrorCode.DUPLICATE_ID)
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			} else if (cntExistEmail != 0) {
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.error(ErrorCode.DUPLICATE_EMAIL)
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			} else if (cntExistNickName != 0) {
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.error(ErrorCode.DUPLICATE_NICKNAME)
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			} else {
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.error(ErrorCode.INVALID_INPUT_VALUE)
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			log.warn(e.getMessage());
+			ResponseDto response = ResponseDto.builder()
+				.success(false)
+				.error(ErrorCode.INTERNAL_SERVER_ERROR)
+				.build();
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	// 회원 정보 조회
 	@Override
-	public ResponseEntity<String> memberInfoCheck(String id) {
+	public ResponseEntity<ResponseDto> memberInfoCheck(String id) {
 		try {
-			ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:81/v1/members/member/{id}",
-				String.class, id);
-			log.info(response.getStatusCode());
-			log.info(response.getHeaders());
-			log.info(response.getBody());
-			return response;
+			JSONObject jsonIdExist = new JSONObject(checkId(id).getBody());
+			log.warn(jsonIdExist);
+			if (jsonIdExist.getJSONObject("data").getLong("count") == 1) {
+				ResponseEntity<Object> result = restTemplate.getForEntity("http://localhost:81/v1/members/member/{id}",
+					Object.class, id);
+
+				ResponseDto response = ResponseDto.builder()
+					.success(true)
+					.data(result.getBody())
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.error(ErrorCode.INVALID_INPUT_VALUE)
+					.build();
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
 			log.warn(e.getMessage());
 			ResponseDto response = ResponseDto.builder()
-				.success(true)
+				.success(false)
 				.error(ErrorCode.INTERNAL_SERVER_ERROR)
 				.build();
-			return null;
-			//return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR)
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -208,7 +261,13 @@ public class MemberServiceImpl implements MemberService {
 				ResponseDto response = ResponseDto.builder().success(true).data(resData).build();
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				ResponseDto response = ResponseDto.builder().success(false).error(ErrorCode.DUPLICATE_ID).build();
+				Map<String, Long> resData = new HashMap<>();
+				resData.put("count", jsonResponse.getLong("count"));
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.data(resData)
+					.error(ErrorCode.DUPLICATE_ID)
+					.build();
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
@@ -238,7 +297,13 @@ public class MemberServiceImpl implements MemberService {
 				ResponseDto response = ResponseDto.builder().success(true).data(resData).build();
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				ResponseDto response = ResponseDto.builder().success(false).error(ErrorCode.DUPLICATE_EMAIL).build();
+				Map<String, Long> resData = new HashMap<>();
+				resData.put("count", jsonResponse.getLong("count"));
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.data(resData)
+					.error(ErrorCode.DUPLICATE_EMAIL)
+					.build();
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
@@ -254,9 +319,6 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			ResponseEntity<String> result = restTemplate.getForEntity(
 				"http://localhost:81/v1/members/nickname/{id}/{nickname}", String.class, id, nickname);
-			log.info(result.getStatusCode());
-			log.info(result.getHeaders());
-			log.info(result.getBody());
 
 			JSONObject jsonResponse = new JSONObject(result.getBody());
 			log.warn(jsonResponse);
@@ -269,9 +331,17 @@ public class MemberServiceImpl implements MemberService {
 				resData.put("currentNickname", jsonResponse.getString("currentNickname"));
 
 				ResponseDto response = ResponseDto.builder().success(true).data(resData).build();
+
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				ResponseDto response = ResponseDto.builder().success(false).error(ErrorCode.DUPLICATE_NICKNAME).build();
+				Map<String, String> resData = new HashMap<>();
+				resData.put("count", jsonResponse.getString("count"));
+				ResponseDto response = ResponseDto.builder()
+					.success(false)
+					.data(resData)
+					.error(ErrorCode.DUPLICATE_NICKNAME)
+					.build();
+
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
@@ -281,7 +351,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
-	// 현재 사용자의 비밀번호가 입력한 현재 비밀번호와 일치하는지
+	// 회원 정보 수정 - 현재 사용자의 비밀번호가 입력한 현재 비밀번호와 일치하는지
 	@Override
 	public String checkPassword(String id) {
 		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:81/v1/members/password/{id}",
