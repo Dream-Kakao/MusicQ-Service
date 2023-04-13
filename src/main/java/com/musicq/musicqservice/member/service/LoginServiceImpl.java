@@ -187,12 +187,13 @@ public class LoginServiceImpl implements LoginService {
 	// id 존재 여부
 	@Override
 	public ResponseEntity<String> checkId(String id) {
-		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:81/v1/members/id/{id}",
+		ResponseEntity<String> result = restTemplate.getForEntity("http://localhost:81/v1/members/id/{id}",
 			String.class, id);
-		log.info(response.getStatusCode());
-		log.info(response.getHeaders());
-		log.info(response.getBody());
-		return response;
+		log.info(result.getStatusCode());
+		log.info(result.getHeaders());
+		log.info(result.getBody());
+
+		return result;
 	}
 
 	// 로그인 시 입력한 id를 가지고 DB에 저장된 Member 비밀 번호와 현재 입력한 Member의 비밀번호를 비교하기 위한 메서드

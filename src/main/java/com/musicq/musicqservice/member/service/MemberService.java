@@ -3,6 +3,8 @@ package com.musicq.musicqservice.member.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.musicq.musicqservice.common.ResponseDto;
+import com.musicq.musicqservice.member.dto.ChangePwDto;
 import com.musicq.musicqservice.member.dto.MemberInfoChangeDto;
 import com.musicq.musicqservice.member.dto.MemberSignUpInfoDto;
 
@@ -12,15 +14,17 @@ public interface MemberService {
 
 	ResponseEntity<String> memberInfoCheck(String id);
 
-	ResponseEntity<Object> memberInfoChange(String id, MemberInfoChangeDto memberInfoChangeDto);
+	ResponseEntity<ResponseDto> memberInfoChange(String id, MemberInfoChangeDto memberInfoChangeDto);
 
-	ResponseEntity<Object> changPassword(String id, String password);
+	String checkPassword(String id);
 
-	ResponseEntity<String> unregister(String id);
+	ResponseEntity<ResponseDto> changePassword(String id, ChangePwDto changePwDto);
 
-	ResponseEntity<String> checkId(String id);
+	ResponseEntity<ResponseDto> unregister(String id);
 
-	ResponseEntity<String> checkEmail(String email);
+	ResponseEntity<ResponseDto> checkId(String id);
 
-	ResponseEntity<String> checkNickname(String id, String nickname);
+	ResponseEntity<ResponseDto> checkEmail(String email);
+
+	ResponseEntity<ResponseDto> checkNickname(String id, String nickname);
 }
